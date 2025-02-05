@@ -1,31 +1,6 @@
 name: Docker Build and Publish
 on:
   workflow_dispatch:
-    inputs:
-      bump:
-        type: choice
-        options:
-          - _
-          - patch
-          - minor
-          - major
-        required: false
-      prerelease:
-        type: choice
-        options:
-          - _
-          - withBuildNumber
-          - withoutBuildNumber
-        required: false
-      prelabel:
-        type: choice
-        options:
-          - _
-          - alpha
-          - beta
-          - rc
-          - snapshot
-        required: false
 
 env:
   REGISTRY: ghcr.io
@@ -51,26 +26,6 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
-      - name: Build Docker Image Locally
-        uses: docker/build-push-action@48aba3b46d1b1fec4febb7c5d0c644b249a11355
-        with:
-          context: .
-          file: ./Dockerfile
-          load: true
-          tags:  |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
-      - name: Inspect the Docker Image
-        run: |
-          docker image inspect ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
-      - run: echo "${{ github.ref }}"
-      - name: Tag a final release
-        id: prerelease
-        uses: actionsdesk/semver@82aa4310e4e21c59cd0020007a4278e733e81dcb
-        with:
-          bump: ${{ inputs.bump }}
-          prerelease: ${{ inputs.prerelease }}
-          prelabel: ${{ inputs.prelabel }}
-          commitish: ${{ github.ref }}
       - name: Push Docker Image
         if: ${{ success() }}
         uses: docker/build-push-action@48aba3b46d1b1fec4febb7c5d0c644b249a11355
@@ -79,7 +34,7 @@ jobs:
           file: ./Dockerfile
           push: true
           tags: |
-            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ steps.prerelease.outputs.release }}
-          platforms: linux/amd64,linux/arm64
+            ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:main
+          platforms: linux/amd64
           provenance: false
           sbom: false
