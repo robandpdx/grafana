@@ -1,31 +1,6 @@
 name: Docker Build and Publish
 on:
   workflow_dispatch:
-    inputs:
-      bump:
-        type: choice
-        options:
-          - _
-          - patch
-          - minor
-          - major
-        required: false
-      prerelease:
-        type: choice
-        options:
-          - _
-          - withBuildNumber
-          - withoutBuildNumber
-        required: false
-      prelabel:
-        type: choice
-        options:
-          - _
-          - alpha
-          - beta
-          - rc
-          - snapshot
-        required: false
 
 env:
   REGISTRY: ghcr.io
